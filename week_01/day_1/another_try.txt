@@ -1,1 +1,3 @@
 making another text file
+
+# think I confused R and github by moving the file on finder
