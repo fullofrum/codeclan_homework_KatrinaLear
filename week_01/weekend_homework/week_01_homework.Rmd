@@ -1,0 +1,44 @@
+---
+title: "week_01_homework"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(janitor)
+```
+
+```{r}
+books <- read.csv("data/books.csv")
+glimpse(books)
+view(books)
+class(books)
+```
+
+```{r}
+
+books %>% 
+  # filter for high average_rating, <= 500 pages
+  filter(average_rating >= 4.5, num_pages <= 500) %>% 
+  #output = title, authors, no. of pages, no. of reviews
+select(title, authors, num_pages, text_reviews_count)
+```
+
+.....
+#### NOT WORKING!!
+
+```{r}
+books %>% 
+  select(title %in% "Harry Potter")
+```
+
+
+```{r}
+filter(books, title %in% c("Harry Potter Collection","In a Sunburned Country"))
+```
+```{r}
+
+filter(books, title %in% c("Harry Potter Collection"))
+```
+  
