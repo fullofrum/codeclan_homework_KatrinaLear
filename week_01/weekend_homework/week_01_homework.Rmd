@@ -3,6 +3,8 @@ title: "week_01_homework"
 output: html_notebook
 ---
 
+
+
 ```{r}
 library(tidyverse)
 library(readxl)
@@ -35,10 +37,22 @@ books %>%
 
 
 ```{r}
-filter(books, title %in% c("Harry Potter Collection","In a Sunburned Country"))
+filter(books, title %in% c("The Lord of the Rings (The Lord of the Rings  #1-3)","In a Sunburned Country"))
+
+
+
+dplyr::filter(books, title == "Bill Bryson's African Diary")
 ```
 ```{r}
 
-filter(books, title %in% c("Harry Potter Collection"))
+dplyr::filter(books, title == "Bill Bryson's African Diary")
 ```
+  
+  
+  
+```{r}
+books %>% 
+  filter(authors == "J.K. Rowling")
+```
+  
   
