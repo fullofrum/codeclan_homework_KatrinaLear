@@ -9,6 +9,7 @@ output: html_notebook
 library(tidyverse)
 library(readxl)
 library(janitor)
+library(stringr)
 ```
 
 ```{r}
@@ -55,4 +56,100 @@ books %>%
   filter(authors == "J.K. Rowling")
 ```
   
+  
+  
+```{r}
+books %>% 
+  filter(authors %in% "Jane Austen")
+```
+  
+  
+  
+```{r}
+#selecting books by searching for partial string
+books %>% 
+  filter(str_detect(authors, "Jane Austen")) %>% 
+select(title, authors)
+```
+  
+  
+..........
+# 1.  Looking at the correlation between number of pages and rating
+  
+```{r}
+ggplot(books, aes(x = average_rating, y = num_pages)) +
+  geom_col()
+```
+
+
+# Noticed that there are a number of ratings of 0 - strip those out
+
+```{r}
+true_ratings <- books %>% 
+  filter(average_rating > 0) 
+  ggplot(true_ratings, aes(x = average_rating, y = num_pages)) +
+  geom_col()
+```
+
+  # Change y axis to log10
+  
+```{r}
+ ggplot(true_ratings, aes(x = average_rating, y = num_pages)) +
+  geom_col() +
+  labs(scale_y_log10)
+
+ggplot(true_ratings, aes(x = average_rating, y = num_pages)) +
+geom_col() +
+scale_y_continuous(trans='log10')
+
+
+ggplot(true_ratings, aes(x = average_rating, y = num_pages, log10 = "y")) +
+geom_col()
+  
+ggplot(true_ratings, aes(x = average_rating, y = num_pages, scale_y_log10())) +
+geom_col()
+
+```
+  
+  
+  #adding some labels
+  
+```{r}
+true_ratings <- books %>% 
+  filter(average_rating > 0) 
+  ggplot(true_ratings, aes(x = average_rating, y = num_pages)) +
+  geom_col() +
+    labs(
+      x = "Average Book Rating",
+      y = "Number of Pages",
+      title = "Average Book Rating by Number of Pages")
+```
+  
+  
+  
+.....
+
+
+continent_avgs_2007 <- gapminder %>% 
+  filter(year == 2007) %>% 
+  group_by(continent) %>% 
+  summarise(
+    average_life_expectancy = mean(lifeExp),
+    average_gdp_per_capita = mean(gdpPercap)
+    )
+
+continent_avgs_2007
+
+```{r}
+published_year_2007 <- books %>% 
+  filter(str_detect(publication_date, "2007"))
+
+published_year_2011 <- books %>% 
+  filter(str_detect(publication_date, "2011"))
+
+published_year_2007 %>% 
+  filter(average_rating >= 4) +
+  
+```
+
   
