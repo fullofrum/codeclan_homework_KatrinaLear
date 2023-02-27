@@ -10,6 +10,7 @@ library(tidyverse)
 library(readxl)
 library(janitor)
 library(stringr)
+library(lubridate)
 ```
 
 ```{r}
@@ -152,4 +153,57 @@ published_year_2007 %>%
   
 ```
 
+ 
+....
+# Lorna/Jamies code for Douglas Adams
+
+
+
+library(lubridate)
+
+
+```{r}
+library(lubridate)
+
+d_adams <- books %>%
+  filter(authors == "Douglas Adams") %>%
+  mutate(date = mdy(publication_date)) #change date format
+
+d_adams %>%
+  arrange(date)
+## date is a character vector not dates
+
+d_adams %>%
+  ggplot() +
+  aes(x = date, y = average_rating) +
+  geom_line(col = "red") +
+  geom_point(col = "red") +
+  labs(
+    x = "Publication Date",
+    y = "Average Rating",
+    title = "Douglas Adams Books",
+    subtitle = "Publication Dates and Average Ratings"
+  )
+  
+```
+
+
+
+
+....# Ian/Jamies code to change the publication language to be able to filter out those is english language (includcing en_US, en_CA)
+
+
+```{r}
+books <- books %>%
+  mutate(language_code_group = if_else(
+    language_code %in% c("eng", "en-US", "en-GB", "en-CA"),
+    "eng",
+    language_code)
+  )
+```
+
+
+
+
+  
   
