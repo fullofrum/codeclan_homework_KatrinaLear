@@ -50,9 +50,9 @@ values_to : the name of your new column where your data will go (that was in you
 
 ```{r}
 diet_comp_clean <- clean_diet %>% 
-pivot_longer(cols = (alcoholic_beverages_fao_2017:wheat_fao_2017), 
-             names_to = "kcal_source", 
-             values_to = "avg_daily_kcals")
+pivot_longer(cols = (alcoholic_beverages_fao_2017:wheat_fao_2017),  # gives range of columns I want to pivot
+             names_to = "kcal_source",  # name of the new column for columns names
+             values_to = "avg_daily_kcals") # name of the new column for the values
 ```
 
 
@@ -64,8 +64,8 @@ Clean `kcal_source` categories by removing any unnecessary information. Then cle
 
 ```{r}
 diet_comp_clean <- diet_comp_clean %>% 
-  rename(country = entity) %>% 
-  mutate(kcal_source = str_remove_all(kcal_source, "_[a-z]{3}_[0-9]{4}$"))
+  rename(country = entity) %>%  #changes entity into country
+  mutate(kcal_source = str_remove_all(kcal_source, "_[a-z]{3}_[0-9]{4}$")) # removes the end -fao_year from the kcal_source
 
 
 #alcoholic_beverages_fao_2017
@@ -98,7 +98,31 @@ missing_code <- diet_comp_clean %>%
   distinct(country, keep_all = FALSE) %>% 
   pull(country)
   
- str_detect(diet_comp_clean, missing_code) 
+
+
+
+diet_comp_clean %>% 
+  select(contains("missing_code"))
+
+diet_comp_clean %>% 
+  str_detect("missing_code")  ## the best option - returns [1] FALSE FALSE FALSE FALSE FALSE
+
+
+
+
+
+str_c(missing_code, sep = "", collapse = NULL) # trying to change vector into 1 string to use
+
+missing_code_single %>%
+  mutate(code = str_c(missing_code, sep = " "))  # trying to change vector into 1 string to use
+
+
+ str_extract(diet_comp_clean, missing_code) 
+
+ 
+ 
+diet_comp_clean %>% 
+  filter(str_detect(country, missing_code))
   
 ```
 
@@ -107,19 +131,72 @@ missing_code <- diet_comp_clean %>%
 
 Ok, we have no available country codes for Cabo Verde and the US in this dataset. Is there anything in the data source about what these should be? No... Ok, better find something online then. Google tells us there's something called ISO Alpha-3 codes which look pretty promising. Wait, what's that in your data folder? Read it in! Then find the missing codes!
 
-<br>
+```{r}
+country_codes <- read_csv("data/country_codes.csv")
+clean_country_codes <- clean_names(country_codes)
+
+
+# changes names in clean country codes - now Cabo Verde and United States of America
+
+clean_country_codes_cvus <- clean_country_codes %>% 
+  mutate(country = case_when(country %in% "Cape Verde" ~ "Cabo Verde",
+                             country %in% "United States" ~ "United States of America",
+                             TRUE ~ country))
+                             
+                            
+# joins diet info with country codes
+
+diet_comp_with_codes <- diet_comp_clean %>% 
+  left_join(clean_country_codes_cvus, by = "country")
+  
+  
+
+
+
+```
+
 
 **Question 7**
 
 Using a suitable recoding function, fill in the lost (but now found) country codes. Overwrite `diet_comp_clean` again. Finally, check that there are now no missing values in the code column.
 
-<br>
+```{r}
+# replace na observations in the monthly_charges column, with the median of that column
+# comms_data_imputed_median <- comms_data %>% mutate(monthly_charges = coalesce(monthly_charges, median(monthly_charges, na.rm = TRUE)))
+
+
+# replaces NA in codes with alpha codes
+imputed_diet <- diet_comp_with_codes %>% 
+  mutate(code = coalesce(code, alpha_3_code))
+  
+  # checks for NA is code column
+imputed_diet %>% 
+  summarise(count = sum(is.na(code)))
+
+# overwrites to diet_comp_clean
+diet_comp_clean <- diet_comp_with_codes %>% 
+  mutate(code = coalesce(code, alpha_3_code))
+
+```
+
+
 
 **Question 8**
 
 _Note: Do **NOT** overwrite `diet_comp_clean` with the result of this question._ 
 
 Join the two datasets so only countries with matches in both are retained. Create a new logical column that is `TRUE` if the first two letters of `code` is the same as `alpha_2_code`.
+
+```{r}
+alpha_diet_country <- diet_comp_clean %>% 
+  semi_join(clean_country_codes, 
+             by = "country",
+             copy = FALSE,
+             keep = FALSE) %>% 
+  mutate()
+
+```
+
 
 <br>
 
