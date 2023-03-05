@@ -188,13 +188,25 @@ _Note: Do **NOT** overwrite `diet_comp_clean` with the result of this question._
 Join the two datasets so only countries with matches in both are retained. Create a new logical column that is `TRUE` if the first two letters of `code` is the same as `alpha_2_code`.
 
 ```{r}
+
+# joining the two datasets
 alpha_diet_country <- diet_comp_clean %>% 
   semi_join(clean_country_codes, 
              by = "country",
              copy = FALSE,
              keep = FALSE) %>% 
-  mutate()
+  
+## totally stuck on this bit
+ select(alpha_diet_country,)
+alpha_test <- alpha_diet_country %>% 
+str_detect("code", "[A-Z]{2}" == "alpha_3_code", )
 
+
+library(dplyr)
+library(stringr)
+df %>%
+     mutate(xyz = +(if_any(everything(), 
+         ~ str_detect(., regex('aa', ignore_case = TRUE)))))
 ```
 
 
@@ -204,6 +216,31 @@ alpha_diet_country <- diet_comp_clean %>%
 
 That's enough of country codes! Let's look at the actual diets of some countries. Using `diet_comp_clean`, which is hopefully untarnished by the monstrosity that was Question 8, create a new variable called `uk_diet` which only contains data from the UK and with all NAs from `avg_daily_kcals` dropped.
 
+
+```{r}
+# new df with uk data
+uk_diet <- diet_comp_clean %>% 
+  filter(code == "GBR") %>% 
+  mutate("uk_diet" = avg_daily_kcals) %>%  
+  drop_na(uk_diet)
+
+
+# wasn't quite sure of question so this is the UK data joined back in with worldwide data - then all NAs dropped
+diet_comp_clean_uk <- diet_comp_clean %>% 
+  full_join(uk_diet, by = c("country", 
+                            "year", 
+                            "code", 
+                            "kcal_source", 
+                            "alpha_2_code", 
+                            "alpha_3_code", 
+                            "avg_daily_kcals")) %>% 
+  drop_na(avg_daily_kcals)
+
+  
+  
+```
+
+
 <br>
 
 **Question 10**
@@ -211,7 +248,12 @@ That's enough of country codes! Let's look at the actual diets of some countries
 Using `uk_diet`, create a new column that contains the difference in total calories between a year and the year before. Then find the year where there was the biggest positive difference and the biggest negative difference.
 
 
-<br>
+```{r}
+uk_diet %>% 
+  group_by(year) %>% 
+  summarise(sum =sum(avg_daily_kcals))
+```
+
 
 **Question 11**
 
