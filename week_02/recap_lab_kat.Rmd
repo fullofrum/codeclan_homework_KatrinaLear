@@ -251,7 +251,8 @@ Using `uk_diet`, create a new column that contains the difference in total calor
 ```{r}
 uk_diet %>% 
   group_by(year) %>% 
-  summarise(sum =sum(avg_daily_kcals))
+  summarise(sum =sum(avg_daily_kcals)) %>% 
+  mutate("kcal_year" = sum * 365)
 ```
 
 
